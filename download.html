@@ -1,5 +1,169 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Download Hamax</title><link rel="icon" href="hamax-icon.png"><link rel="stylesheet" href="style.css"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3201957532693982" crossorigin="anonymous"></script></head><body><header class="navbar">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Download Hamax</title>
+<link rel="icon" href="hamax-icon.png">
+<link rel="stylesheet" href="style.css">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3201957532693982" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="navbar">
 <a class="brand" href="index.html"><img src="hamax-icon.png" alt="Hamax"><span>HAMAX</span></a>
-<nav><a href="index.html">Home</a><a href="features.html">Features</a><a href="how-it-works.html">How it works</a><a href="about.html">About</a><a href="faq.html">FAQ</a><a href="download.html">Download</a><a href="advertise.html">Advertise</a></nav>
+<nav>
+<a href="index.html">Home</a>
+<a href="features.html">Features</a>
+<a href="how-it-works.html">How it works</a>
+<a href="about.html">About</a>
+<a href="faq.html">FAQ</a>
+<a href="download.html">Download</a>
+<a href="advertise.html">Advertise</a>
+</nav>
 <a class="nav-cta" href="download.html">Download</a>
-</header><main><section class="page"><div class="kicker">HAMAX FOR WINDOWS</div><h1>Get<br><em>Hamax.</em></h1><p class="page-intro">Download the latest Hamax Downloader for Windows. Extract the ZIP file and run Hamax.Downloader.exe to get started.</p><div class="card"><div class="iconbox">↓</div><h3 style="font-size:21px">Hamax Downloader for Windows</h3><p style="margin:8px 0 22px">Latest stable release · Windows desktop application</p><a class="primary" href="https://github.com/drmuhammed/Hamax/releases/latest/download/Hamax-Downloader-v1.0.0-Windows-x64.zip">Download Hamax →</a><p style="margin-top:15px;color:#5f5f65;font-size:11px">Windows x64 · ZIP download · Latest stable release</p></div></section></main><footer><div class="footer-brand"><img src="hamax-icon.png" alt="Hamax"> HAMAX</div><div class="footer-links"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="contact.html">Contact</a></div><div>© 2026 Hamax. All rights reserved.</div></footer><script src="script.js"></script></body></html>
+</header>
+
+<main>
+<section class="page">
+<div class="kicker">HAMAX FOR WINDOWS</div>
+<h1>Get<br><em>Hamax.</em></h1>
+<p class="page-intro">Download the latest Hamax Downloader for Windows. Extract the ZIP file and run Hamax.Downloader.exe to get started.</p>
+
+<div class="card">
+<div class="iconbox">↓</div>
+<h3 id="latest-title" style="font-size:21px">Hamax Downloader for Windows</h3>
+<p id="latest-description" style="margin:8px 0 22px">Latest stable release · Windows desktop application</p>
+<a id="latest-download" class="primary" href="https://github.com/drmuhammed/Hamax/releases/latest/download/Hamax-Downloader-v1.0.0-Windows-x64.zip">Download Hamax →</a>
+<p id="latest-stats" style="margin-top:15px;color:#5f5f65;font-size:11px">Windows x64 · ZIP download · Latest stable release</p>
+</div>
+
+<div style="margin-top:45px">
+<div class="kicker">PREVIOUS VERSIONS</div>
+<h2 style="margin-top:8px">Release history.</h2>
+<p class="page-intro" style="margin-bottom:24px">Older Hamax releases are kept here in case you need to reinstall or roll back to an earlier version.</p>
+<div id="release-list">
+<div class="card"><p style="margin:0;color:#5f5f65">Loading releases...</p></div>
+</div>
+</div>
+
+</section>
+</main>
+
+<footer>
+<div class="footer-brand"><img src="hamax-icon.png" alt="Hamax"> HAMAX</div>
+<div class="footer-links"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+<div>© 2026 Hamax. All rights reserved.</div>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const page = location.pathname.split("/").pop() || "index.html";
+    document.querySelectorAll("nav a").forEach(a =>
+        a.classList.toggle("active", a.getAttribute("href") === page)
+    );
+
+    const apiUrl = "https://api.github.com/repos/drmuhammed/Hamax/releases";
+
+    function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, ch => ({
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#039;"
+        }[ch]));
+    }
+
+    function formatDate(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        return date.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
+    }
+
+    function findWindowsZip(release) {
+        return (release.assets || []).find(asset =>
+            asset.name.toLowerCase().endsWith(".zip") &&
+            asset.name.toLowerCase().includes("windows")
+        );
+    }
+
+    fetch(apiUrl, {
+        headers: { "Accept": "application/vnd.github+json" }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Could not load releases");
+        return response.json();
+    })
+    .then(releases => {
+        const published = releases.filter(r => !r.draft && !r.prerelease);
+
+        if (!published.length) {
+            throw new Error("No releases found");
+        }
+
+        const latest = published[0];
+        const latestZip = findWindowsZip(latest);
+
+        if (latestZip) {
+            document.getElementById("latest-download").href = latestZip.browser_download_url;
+            document.getElementById("latest-stats").textContent =
+                "Windows x64 · ZIP download · " +
+                latestZip.download_count.toLocaleString() + " downloads";
+        }
+
+        document.getElementById("latest-title").textContent =
+            "Hamax Downloader " + latest.tag_name;
+
+        document.getElementById("latest-description").textContent =
+            "Latest stable release · Windows desktop application · " +
+            formatDate(latest.published_at);
+
+        const previous = published.slice(1);
+        const list = document.getElementById("release-list");
+
+        if (!previous.length) {
+            list.innerHTML =
+                '<div class="card"><p style="margin:0;color:#5f5f65">No previous versions yet. Older releases will appear here after new versions are published.</p></div>';
+            return;
+        }
+
+        list.innerHTML = previous.map(release => {
+            const zip = findWindowsZip(release);
+            const downloadLink = zip
+                ? zip.browser_download_url
+                : release.html_url;
+            const count = zip
+                ? zip.download_count.toLocaleString() + " downloads"
+                : "Release page";
+
+            return `
+                <div class="card" style="margin-bottom:16px">
+                    <h3 style="font-size:19px;margin-bottom:6px">
+                        Hamax Downloader ${escapeHtml(release.tag_name)}
+                    </h3>
+                    <p style="margin:0 0 16px;color:#5f5f65;font-size:13px">
+                        Released ${escapeHtml(formatDate(release.published_at))} · ${escapeHtml(count)}
+                    </p>
+                    <a class="primary" href="${escapeHtml(downloadLink)}">
+                        Download ${escapeHtml(release.tag_name)} →
+                    </a>
+                </div>
+            `;
+        }).join("");
+    })
+    .catch(() => {
+        document.getElementById("latest-stats").textContent =
+            "Windows x64 · ZIP download · Download statistics unavailable";
+        document.getElementById("release-list").innerHTML =
+            '<div class="card"><p style="margin:0;color:#5f5f65">Release history is temporarily unavailable. You can still use the latest download button above.</p></div>';
+    });
+});
+</script>
+
+</body>
+</html>
