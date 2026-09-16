@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport"
+      content="width=device-width,initial-scale=1">
+
+<title>Hamax Statistics</title>
+
+<link rel="icon" href="hamax-icon.png">
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+.stats-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 120px 30px 80px;
+}
+
+.login-box {
+    max-width: 420px;
+    margin: 80px auto;
+    padding: 35px;
+    background: #141416;
+    border: 1px solid #2d2d31;
+    border-radius: 14px;
+}
+
+.login-box h1 {
+    margin-bottom: 10px;
+}
+
+.login-box p {
+    color: #77777f;
+    margin-bottom: 25px;
+}
+
+.login-box input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 14px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #333338;
+    background: #0d0d0f;
+    color: white;
+    font-size: 14px;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 13px;
+    border: 0;
+    border-radius: 8px;
+    background: white;
+    color: black;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.error {
+    color: #ff6b6b;
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    gap: 20px;
+}
+
+.dashboard-header h1 {
+    margin: 0;
+}
+
+.logout-button {
+    border: 1px solid #333338;
+    background: transparent;
+    color: #aaa;
+    padding: 9px 15px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, 1fr);
+    gap: 16px;
+}
+
+.stat-card {
+    background: #141416;
+    border: 1px solid #2d2d31;
+    border-radius: 14px;
+    padding: 25px;
+}
+
+.stat-icon {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+.stat-number {
+    font-size: 34px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #77777f;
+    font-size: 13px;
+}
+
+.dashboard-section {
+    margin-top: 45px;
+}
+
+.dashboard-section h2 {
+    margin-bottom: 18px;
+}
+
+.data-card {
+    background: #141416;
+    border: 1px solid #2d2d31;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 17px 22px;
+    border-bottom: 1px solid #252529;
+}
+
+.data-row:last-child {
+    border-bottom: 0;
+}
+
+.data-name {
+    font-weight: 600;
+}
+
+.data-value {
+    color: #aaa;
+}
+
+.refresh-text {
+    color: #77777f;
+    font-size: 12px;
+    margin-top: 25px;
+}
+
+.loading {
+    color: #77777f;
+}
+
+@media (max-width: 800px) {
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+<a class="brand" href="index.html">
+
+<img src="hamax-icon.png"
+     alt="Hamax">
+
+<span>HAMAX</span>
+
+</a>
+
+
+<nav>
+
+<a href="index.html">Home</a>
+
+<a href="features.html">Features</a>
+
+<a href="how-it-works.html">
+How it works
+</a>
+
+<a href="about.html">About</a>
+
+<a href="faq.html">FAQ</a>
+
+<a href="download.html">Download</a>
+
+<a href="advertise.html">Advertise</a>
+
+</nav>
+
+</header>
+
+
+
+<main class="stats-page">
+
+
+<!-- =====================================================
+     LOGIN
+     ===================================================== -->
+
+<div id="login-section"
+     class="login-box">
+
+<div class="kicker">
+    HAMAX ADMIN
+</div>
+
+<h1>
+    Statistics
+</h1>
+
+<p>
+    Sign in to view Hamax usage statistics.
+</p>
+
+
+<input
+    id="email"
+    type="email"
+    placeholder="Email"
+    autocomplete="username"
+>
+
+
+<input
+    id="password"
+    type="password"
+    placeholder="Password"
+    autocomplete="current-password"
+>
+
+
+<button id="login-button">
+    Sign in
+</button>
+
+
+<div id="login-error"
+     class="error">
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     DASHBOARD
+     ===================================================== -->
+
+<div id="dashboard"
+     style="display:none;">
+
+
+<div class="dashboard-header">
+
+<div>
+
+<div class="kicker">
+    HAMAX STATISTICS
+</div>
+
+<h1>
+    Usage overview.
+</h1>
+
+</div>
+
+
+<button
+    id="logout-button"
+    class="logout-button">
+
+    Sign out
+
+</button>
+
+</div>
+
+
+
+<div class="stats-grid">
+
+
+<div class="stat-card">
+
+<div class="stat-icon">
+    👤
+</div>
+
+<div
+    id="total-users"
+    class="stat-number">
+
+    —
+
+</div>
+
+<div class="stat-label">
+    Total users
+</div>
+
+</div>
+
+
+
+<div class="stat-card">
+
+<div class="stat-icon">
+    🚀
+</div>
+
+<div
+    id="total-launches"
+    class="stat-number">
+
+    —
+
+</div>
+
+<div class="stat-label">
+    Total launches
+</div>
+
+</div>
+
+
+
+<div class="stat-card">
+
+<div class="stat-icon">
+    🟢
+</div>
+
+<div
+    id="active-users"
+    class="stat-number">
+
+    —
+
+</div>
+
+<div class="stat-label">
+    Active users · 30 days
+</div>
+
+</div>
+
+
+
+<div class="stat-card">
+
+<div class="stat-icon">
+    📥
+</div>
+
+<div
+    id="total-downloads"
+    class="stat-number">
+
+    —
+
+</div>
+
+<div class="stat-label">
+    Total Windows downloads
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     VERSION USAGE
+     ===================================================== -->
+
+<div class="dashboard-section">
+
+<div class="kicker">
+    VERSION USAGE
+</div>
+
+<h2>
+    Users by version.
+</h2>
+
+
+<div
+    id="version-list"
+    class="data-card">
+
+    <div class="data-row">
+        <span class="loading">
+            Loading...
+        </span>
+    </div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================================
+     RELEASE DOWNLOADS
+     ===================================================== -->
+
+<div class="dashboard-section">
+
+<div class="kicker">
+    DOWNLOADS
+</div>
+
+<h2>
+    Release downloads.
+</h2>
+
+
+<div
+    id="release-list"
+    class="data-card">
+
+    <div class="data-row">
+        <span class="loading">
+            Loading...
+        </span>
+    </div>
+
+</div>
+
+</div>
+
+
+
+<div
+    id="updated"
+    class="refresh-text">
+
+    Loading statistics...
+
+</div>
+
+
+</div>
+
+</main>
+
+
+
+<footer>
+
+<div class="footer-brand">
+
+<img src="hamax-icon.png"
+     alt="Hamax">
+
+HAMAX
+
+</div>
+
+
+<div class="footer-links">
+
+<a href="privacy.html">
+Privacy
+</a>
+
+<a href="terms.html">
+Terms
+</a>
+
+<a href="contact.html">
+Contact
+</a>
+
+</div>
+
+
+<div>
+© 2026 Hamax. All rights reserved.
+</div>
+
+</footer>
+
+
+
+<script>
+
+const SUPABASE_URL =
+    "https://qohycbucbuijavpvwngo.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_BUVAr_5yZxeYZbAhAw-H1Q_d1xpQoVo";
+
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+
+/* =====================================================
+   ELEMENTS
+   ===================================================== */
+
+const loginSection =
+    document.getElementById(
+        "login-section"
+    );
+
+const dashboard =
+    document.getElementById(
+        "dashboard"
+    );
+
+const loginButton =
+    document.getElementById(
+        "login-button"
+    );
+
+const logoutButton =
+    document.getElementById(
+        "logout-button"
+    );
+
+const loginError =
+    document.getElementById(
+        "login-error"
+    );
+
+
+
+/* =====================================================
+   LOGIN
+   ===================================================== */
+
+loginButton.addEventListener(
+    "click",
+    async () => {
+
+        loginError.textContent = "";
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
+
+        const password =
+            document
+                .getElementById("password")
+                .value;
+
+
+        if (!email || !password) {
+
+            loginError.textContent =
+                "Please enter your email and password.";
+
+            return;
+        }
+
+
+        loginButton.disabled = true;
+
+        loginButton.textContent =
+            "Signing in...";
+
+
+        const {
+            error
+        } =
+            await supabaseClient.auth
+                .signInWithPassword({
+                    email,
+                    password
+                });
+
+
+        loginButton.disabled = false;
+
+        loginButton.textContent =
+            "Sign in";
+
+
+        if (error) {
+
+            loginError.textContent =
+                "Invalid email or password.";
+
+            return;
+        }
+
+
+        showDashboard();
+
+    }
+);
+
+
+
+/* =====================================================
+   LOGOUT
+   ===================================================== */
+
+logoutButton.addEventListener(
+    "click",
+    async () => {
+
+        await supabaseClient.auth.signOut();
+
+        dashboard.style.display =
+            "none";
+
+        loginSection.style.display =
+            "block";
+
+    }
+);
+
+
+
+/* =====================================================
+   SHOW DASHBOARD
+   ===================================================== */
+
+async function showDashboard() {
+
+    loginSection.style.display =
+        "none";
+
+    dashboard.style.display =
+        "block";
+
+    await loadStatistics();
+
+}
+
+
+
+/* =====================================================
+   LOAD STATISTICS
+   ===================================================== */
+
+async function loadStatistics() {
+
+    document.getElementById(
+        "updated"
+    ).textContent =
+        "Loading statistics...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.functions
+            .invoke("get-stats");
+
+
+    if (error || !data || !data.success) {
+
+        document.getElementById(
+            "updated"
+        ).textContent =
+            "Could not load statistics.";
+
+        console.error(
+            "Statistics error:",
+            error
+        );
+
+        return;
+    }
+
+
+    const stats =
+        data.statistics;
+
+
+
+    /* =================================================
+       MAIN CARDS
+       ================================================= */
+
+    document.getElementById(
+        "total-users"
+    ).textContent =
+        Number(
+            stats.total_users || 0
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "total-launches"
+    ).textContent =
+        Number(
+            stats.total_launches || 0
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "active-users"
+    ).textContent =
+        Number(
+            stats.active_users_30_days || 0
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "total-downloads"
+    ).textContent =
+        Number(
+            stats.total_downloads || 0
+        ).toLocaleString();
+
+
+
+    /* =================================================
+       VERSION LIST
+       ================================================= */
+
+    const versionList =
+        document.getElementById(
+            "version-list"
+        );
+
+
+    if (
+        !data.users_by_version ||
+        !data.users_by_version.length
+    ) {
+
+        versionList.innerHTML =
+            '<div class="data-row">' +
+            '<span>No version data.</span>' +
+            '</div>';
+
+    } else {
+
+        versionList.innerHTML =
+            data.users_by_version
+                .map(item => `
+
+                    <div class="data-row">
+
+                        <span class="data-name">
+                            ${escapeHtml(
+                                item.version
+                            )}
+                        </span>
+
+                        <span class="data-value">
+                            ${Number(
+                                item.users || 0
+                            ).toLocaleString()}
+                            users
+                        </span>
+
+                    </div>
+
+                `)
+                .join("");
+
+    }
+
+
+
+    /* =================================================
+       RELEASE DOWNLOADS
+       ================================================= */
+
+    const releaseList =
+        document.getElementById(
+            "release-list"
+        );
+
+
+    if (
+        !data.releases ||
+        !data.releases.length
+    ) {
+
+        releaseList.innerHTML =
+            '<div class="data-row">' +
+            '<span>No release data.</span>' +
+            '</div>';
+
+    } else {
+
+        releaseList.innerHTML =
+            data.releases
+                .map(item => `
+
+                    <div class="data-row">
+
+                        <span class="data-name">
+                            ${escapeHtml(
+                                item.version
+                            )}
+                        </span>
+
+                        <span class="data-value">
+                            ${Number(
+                                item.downloads || 0
+                            ).toLocaleString()}
+                            downloads
+                        </span>
+
+                    </div>
+
+                `)
+                .join("");
+
+    }
+
+
+
+    /* =================================================
+       UPDATED TIME
+       ================================================= */
+
+    const generated =
+        data.generated_at
+            ? new Date(
+                data.generated_at
+              ).toLocaleString()
+            : "";
+
+
+    document.getElementById(
+        "updated"
+    ).textContent =
+        "Last updated: " +
+        generated;
+
+}
+
+
+
+/* =====================================================
+   HTML ESCAPING
+   ===================================================== */
+
+function escapeHtml(value) {
+
+    return String(
+        value ?? ""
+    ).replace(
+        /[&<>"']/g,
+        ch => ({
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#039;"
+        }[ch])
+    );
+
+}
+
+
+
+/* =====================================================
+   CHECK EXISTING SESSION
+   ===================================================== */
+
+supabaseClient.auth
+    .getSession()
+    .then(({ data }) => {
+
+        if (data.session) {
+
+            showDashboard();
+
+        }
+
+    });
+
+</script>
+
+
+</body>
+</html>
